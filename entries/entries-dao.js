@@ -27,3 +27,11 @@ export const countDropped = (uid) => {
 export const findEntryByUserAndGameId = (uid, gid) => {
     return entriesModel.findOne({user: uid, gameId: gid})
 }
+
+export const deleteEntry = (uid, gid) => {
+    return entriesModel.deleteOne({user: uid, gameId: gid})
+}
+
+export const findUserPlayingEntries = (uid) => {
+    return entriesModel.find({user: uid, status: "Playing"}).limit(4)
+}

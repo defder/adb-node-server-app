@@ -17,18 +17,22 @@ const EntriesController = (app) => {
     }
 
     const getEntryCategoryCount = async (req, res) => {
-        const uid = req.session['currentUser']._id
-        const completedCount = await entriesDao.countCompleted(uid)
-        const playingCount = await entriesDao.countPlaying(uid)
-        const planToPlayCount = await entriesDao.countPlanToPlay(uid)
-        const droppedCount = await entriesDao.countDropped(uid)
+        if (req.session['currentUser']) {
+            const uid = req.session['currentUser']._id
+            const completedCount = await entriesDao.countCompleted(uid)
+            const playingCount = await entriesDao.countPlaying(uid)
+            const planToPlayCount = await entriesDao.countPlanToPlay(uid)
+            const droppedCount = await entriesDao.countDropped(uid)
 
-        res.json({
-            completed: completedCount,
-            playing: playingCount,
-            planToPlay: planToPlayCount,
-            dropped: droppedCount
-        })
+            res.json({
+                completed: completedCount,
+                playing: playingCount,
+                planToPlay: planToPlayCount,
+                dropped: droppedCount
+            })
+        } else {
+            res.sendStatus(404)
+        }
     }
 
     const getEntryByUserAndGameId = async (req, res) => {
@@ -36,8 +40,29 @@ const EntriesController = (app) => {
             const uid = req.session['currentUser']._id
             const gameId = req.params.gameId
             const existingEntry = await entriesDao.findEntryByUserAndGameId(uid, gameId)
-            console.log("entry", existingEntry)
             res.json(existingEntry)
+        } else {
+            res.send(null)
+        }
+    }
+
+    const deleteEntryByGameId = async (req, res) => {
+        if (req.session['currentUser']) {
+            const uid = req.session['currentUser']._id
+            const gameId = req.params.gameId
+            const deleteStatus = await entriesDao.deleteEntry(uid, gameId)
+            res.json(deleteStatus)
+        } else {
+            res.sendStatus(404)
+        }
+    }
+
+    const findUserEntryByPlaying = async (req, res) => {
+        if (req.session['currentUser']) {
+            const uid = req.session['currentUser']._id
+            const playingEntries = await entriesDao.findUserPlayingEntries(uid)
+            console.log("Currently Playing", playingEntries)
+            res.json(playingEntries)
         } else {
             res.send(null)
         }
@@ -47,5 +72,6 @@ const EntriesController = (app) => {
     app.get("/entries/find/:user", findEntryByUser)
     app.get("/entries/count", getEntryCategoryCount)
     app.get("/entries/exists/:gameId", getEntryByUserAndGameId)
+    app.delete("/entries/delete/:gameId", deleteEntryByGameId)
 }
 export default EntriesController
