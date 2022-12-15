@@ -1,7 +1,5 @@
 import * as userDao from "./users-dao.js";
 
-let currentUser = null
-
 const UsersController = (app) => {
     // Primary just for testing database connection
     const findAllUsers = async (req, res) => {
@@ -27,17 +25,17 @@ const UsersController = (app) => {
 
     const login = async (req, res) => {
         const credentials = req.body
-        const userExists = await userDao.findUserByCredentials(credentials.username, credentials.password)
-        if (userExists) {
-            currentUser = userExists
-            res.json(userExists)
+        const existingUser = await userDao.findUserByCredentials(credentials.username, credentials.password)
+        if (existingUser) {
+            req.session['currentUser'] = existingUser
+            res.json(existingUser)
         } else {
             res.sendStatus(403)
         }
     }
 
     const logout = (req, res) => {
-        currentUser = null
+        req.session.destroy()
         res.sendStatus(200)
     }
 
@@ -49,13 +47,33 @@ const UsersController = (app) => {
         }
     }
 
+    const findUserById = async (req, res) => {
+        const uid = req.params.uid
+        const user = await userDao.findUserById(uid)
+        if (user) {
+            res.json(user)
+        } else {
+            res.sendStatus(404)
+        }
+    }
+
+    const updateUser = async (req, res) => {
+        const uid = req.session['currentUser']._id
+        const updates = req.body
+        const updatedUser = await userDao.updateUsers(uid, updates)
+        req.session['currentUser'] = updatedUser
+        res.json(updatedUser)
+    }
+
     // Endpoints
     app.get('/users', findAllUsers)
+    app.get('/users/:uid', findUserById)
 
     // Related to logging in and signing out
     app.post('/register', register)
     app.post('/login', login)
     app.post('/logout', logout)
     app.post('/profile', getCurrentUser)
+    app.put('/profile/:uid', updateUser)
 }
 export default UsersController;
