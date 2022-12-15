@@ -5,7 +5,7 @@ export const findAllUsers = async () => {
 }
 
 export const updateUsers = async (uid, updates) => {
-    return usersModel.updateOne({_id: uid}, {$set: updates})
+    return usersModel.findByIdAndUpdate({_id: uid}, updates, {new: true})
 }
 
 export const findUserByCredentials = async (username, password) => {
@@ -18,4 +18,8 @@ export const findUserByUsername = async (username) => {
 
 export const createUser = async (user) => {
     return usersModel.create(user)
+}
+
+export const findUserById = (uid) => {
+    return usersModel.findById(uid)
 }
