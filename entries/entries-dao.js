@@ -35,3 +35,7 @@ export const deleteEntry = (uid, gid) => {
 export const findUserPlayingEntries = (uid) => {
     return entriesModel.find({user: uid, status: "Playing"}).limit(4)
 }
+
+export const findEntryByGame = (gid) => {
+    return entriesModel.find({gameId: gid}).populate("user").exec()
+}
