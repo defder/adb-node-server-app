@@ -4,6 +4,7 @@ import session from "express-session";
 import mongoose from "mongoose";
 import UsersController from "./users/users-controller.js"
 import EntriesController from "./entries/entries-controller.js";
+import ReviewsController from "./reviews/reviews-controller.js"
 
 mongoose.connect('mongodb://localhost:27017/adb').then(r => console.log("Connected!"));
 
@@ -21,4 +22,5 @@ app.use(session({
 app.use(express.json());
 UsersController(app);
 EntriesController(app)
+ReviewsController(app)
 app.listen(4000);

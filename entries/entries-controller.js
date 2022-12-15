@@ -68,10 +68,17 @@ const EntriesController = (app) => {
         }
     }
 
+    const findEntriesByGameId = async (req, res) => {
+        const gameId = req.params.gameId
+        const entries = await entriesDao.findEntryByGame(gameId)
+        res.json(entries)
+    }
+
     app.post("/entries/create", createEntry)
     app.get("/entries/find/:user", findEntryByUser)
     app.get("/entries/count", getEntryCategoryCount)
     app.get("/entries/exists/:gameId", getEntryByUserAndGameId)
     app.delete("/entries/delete/:gameId", deleteEntryByGameId)
+    app.get("/entries/findAll/:gameId", findEntriesByGameId)
 }
 export default EntriesController
